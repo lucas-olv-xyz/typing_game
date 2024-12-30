@@ -33,7 +33,7 @@ side = random.randint(0,3)# 0=esq, 1=dir, 2=top, 3=bottom
 #-------------------------ANIMAÇÕES-------------------------------
 player_idle_frames = [pygame.image.load('h1.png'),pygame.image.load('h2.png'),pygame.image.load('h3.png')]
 enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png'),pygame.image.load('e3.png')]
-    
+
 #-------------------TELA INICIAL------------------------------------
 def show_start_screen():
     start_running = True
