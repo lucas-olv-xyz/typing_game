@@ -3,6 +3,7 @@ import random
 import sys
 
 pygame.init()
+#no game over mostrar qual rapido  a sua cadencia de palavras foi, WPM
 
 #tela
 WINDOW_WIDTH = 1200
@@ -19,7 +20,7 @@ monster_alive = True
 vidas = 3
 
 #------------------PERSONAGEM---------------------------------
-player_img = pygame.image.load('typing_game/assets/h1.png')
+player_img = pygame.image.load('h1.png')
 width, height = player_img.get_size()
 player_rect = player_img.get_rect()
 #posição na tela
@@ -30,10 +31,9 @@ player_rect.center = (x_pos,y_pos)
 side = random.randint(0,3)# 0=esq, 1=dir, 2=top, 3=bottom
 
 #-------------------------ANIMAÇÕES-------------------------------
-player_idle_frames = [pygame.image.load('typing_game/assets/h1.png'),pygame.image.load('typing_game/assets/h2.png'),pygame.image.load('typing_game/assets/h3.png')]
-enemy_idle_frames = [pygame.image.load('typing_game/assets/e1.png'),pygame.image.load('typing_game/assets/e2.png'),pygame.image.load('typing_game/assets/e3.png')]
+player_idle_frames = [pygame.image.load('h1.png'),pygame.image.load('h2.png'),pygame.image.load('h3.png')]
+enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png'),pygame.image.load('e3.png')]
     
-
 #-------------------TELA INICIAL------------------------------------
 def show_start_screen():
     start_running = True
