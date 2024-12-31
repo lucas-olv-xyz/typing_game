@@ -84,11 +84,13 @@ def spawn_monster():
     "M", "N", "O", "P", "Q", "R", 
     "S", "T", "U", "V", "W", "X", 
     "Y", "Z"]
+    
     words_medium = [ "ABACAXI", "BOLA", "CACHORRO", "DINOSSAURO", "ELEFANTE", "FLORESTA", 
     "GATO", "HIPOPOTAMO", "IGLU", "JOGADOR", "KIWI", "LIVRO", 
     "MACACO", "NAVIO", "OVELHA", "PINGUIM", "QUEIJO", "RATO", 
     "SAPATO", "TIGRE", "URSO", "VIOLINO", "WAFFLE", "XAROPE", 
     "YOGA", "ZEBRA"]
+    
     words_hard = [ "ARQUIPELAGO", "BIBLIOTECA", "CATASTROFICO", "DESENVOLVIMENTO", 
     "ELETRONICO", "FOTOSSINTETICO", "GEOMETRICO", "HIERARQUIA", 
     "IMPOSSIBILIDADE", "JURISPRUDENCIA", "KILOMETRAGEM", "LABIRINTICO", 
