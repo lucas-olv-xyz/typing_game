@@ -19,6 +19,25 @@ user_input = ""
 monster_alive = True
 vidas = 3
 
+words_easy = ["A", "B", "C", "D", "E", "F", 
+    "G", "H", "I", "J", "K", "L", 
+    "M", "N", "O", "P", "Q", "R", 
+    "S", "T", "U", "V", "W", "X", 
+    "Y", "Z"]
+    
+words_medium = [ "ABACAXI", "BOLA", "CACHORRO", "DINOSSAURO", "ELEFANTE", "FLORESTA", 
+    "GATO", "HIPOPOTAMO", "IGLU", "JOGADOR", "KIWI", "LIVRO", 
+    "MACACO", "NAVIO", "OVELHA", "PINGUIM", "QUEIJO", "RATO", 
+    "SAPATO", "TIGRE", "URSO", "VIOLINO", "WAFFLE", "XAROPE", 
+    "YOGA", "ZEBRA"]
+    
+words_hard = [ "ARQUIPELAGO", "BIBLIOTECA", "CATASTROFICO", "DESENVOLVIMENTO", 
+    "ELETRONICO", "FOTOSSINTETICO", "GEOMETRICO", "HIERARQUIA", 
+    "IMPOSSIBILIDADE", "JURISPRUDENCIA", "KILOMETRAGEM", "LABIRINTICO", 
+    "METAMORFOSE", "NEUROLOGICO", "ORNITOLOGIA", "PROCRASTINACAO", 
+    "QUIMERICO", "REVOLUCIONARIO", "SIMETRICO", "TRANSCENDENTAL", 
+    "UNIVERSALIDADE", "VEROSSIMILHANCA", "WESTERNIANO", "XILOFONISTA", 
+    "YOUTUBERS", "ZUMBIFICADO"]
 #------------------PERSONAGEM---------------------------------
 player_img = pygame.image.load('h1.png')
 width, height = player_img.get_size()
@@ -35,16 +54,25 @@ player_idle_frames = [pygame.image.load('h1.png'),pygame.image.load('h2.png'),py
 enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png'),pygame.image.load('e3.png')]
 
 #-------------------TELA INICIAL------------------------------------
-def show_start_screen():
+def show_start_screen_with_difficulty():
     start_running = True
+    selected_difficulty = None
+    
     while start_running:
         tela.fill(GREEN)
         
         title_text = font.render("Type Mosquito", True, (BLACK))
-        instruction_text = font.render("Pressione ENTER para começar", True, (BLACK))
+        instruction_text = font.render("Escolha a Dificuldade:", True, (BLACK))
+        easy_text = font.render("1 - Fácil (letras / monstro lento)", True, (BLACK))
+        medium_text = font.render("2 - Médio (palavras curtas / monstro médio)", True, (BLACK))
+        hard_text = font.render("3 - Difícil (palavras grandes / monstro rápido)", True, (BLACK))
         
-        tela.blit(title_text, (WINDOW_WIDTH//2-80, WINDOW_HEIGHT//2-50))
-        tela.blit(instruction_text, (WINDOW_WIDTH//2-180, WINDOW_HEIGHT//2))
+        # Desenha os textos na tela
+        tela.blit(title_text, (WINDOW_WIDTH//2 - 80, WINDOW_HEIGHT//2 - 150))
+        tela.blit(instruction_text, (WINDOW_WIDTH//2 - 120, WINDOW_HEIGHT//2 - 100))
+        tela.blit(easy_text, (WINDOW_WIDTH//2 - 120, WINDOW_HEIGHT//2 - 40))
+        tela.blit(medium_text, (WINDOW_WIDTH//2 - 120, WINDOW_HEIGHT//2 + 0))
+        tela.blit(hard_text, (WINDOW_WIDTH//2 - 120, WINDOW_HEIGHT//2 + 40))
         
         pygame.display.flip()
         
@@ -52,9 +80,20 @@ def show_start_screen():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                start_running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    selected_difficulty = "easy"
+                    start_running = False
+                elif event.key == pygame.K_2:
+                    selected_difficulty = "medium"
+                    start_running = False
+                elif event.key == pygame.K_3:
+                    selected_difficulty = "hard"
+                    start_running = False
 
+    return selected_difficulty
+
+selected_difficulty = show_start_screen_with_difficulty()
 #-------------------SPAWN DE MONSTROS ALEATORIOS-----------------------------
 def spawn_monster():
     monster_img = enemy_idle_frames[0]
@@ -74,46 +113,30 @@ def spawn_monster():
         x = random.randint(0,WINDOW_WIDTH)
         y = WINDOW_HEIGHT
     
-    #rect acompanha a localização dos mobs    
     monster_rect.x = x
     monster_rect.y = y
     
-    #DICIONARIO DE PALAVRAS
-    words_easy = ["A", "B", "C", "D", "E", "F", 
-    "G", "H", "I", "J", "K", "L", 
-    "M", "N", "O", "P", "Q", "R", 
-    "S", "T", "U", "V", "W", "X", 
-    "Y", "Z"]
-    
-    words_medium = [ "ABACAXI", "BOLA", "CACHORRO", "DINOSSAURO", "ELEFANTE", "FLORESTA", 
-    "GATO", "HIPOPOTAMO", "IGLU", "JOGADOR", "KIWI", "LIVRO", 
-    "MACACO", "NAVIO", "OVELHA", "PINGUIM", "QUEIJO", "RATO", 
-    "SAPATO", "TIGRE", "URSO", "VIOLINO", "WAFFLE", "XAROPE", 
-    "YOGA", "ZEBRA"]
-    
-    words_hard = [ "ARQUIPELAGO", "BIBLIOTECA", "CATASTROFICO", "DESENVOLVIMENTO", 
-    "ELETRONICO", "FOTOSSINTETICO", "GEOMETRICO", "HIERARQUIA", 
-    "IMPOSSIBILIDADE", "JURISPRUDENCIA", "KILOMETRAGEM", "LABIRINTICO", 
-    "METAMORFOSE", "NEUROLOGICO", "ORNITOLOGIA", "PROCRASTINACAO", 
-    "QUIMERICO", "REVOLUCIONARIO", "SIMETRICO", "TRANSCENDENTAL", 
-    "UNIVERSALIDADE", "VEROSSIMILHANCA", "WESTERNIANO", "XILOFONISTA", 
-    "YOUTUBERS", "ZUMBIFICADO"]
-    monster_word = random.choice(words_easy)
-    
-    if score < 40:
+    # Dependendo da dificuldade selecionada, sorteie do array correspondente
+    if selected_difficulty == "easy":
         monster_word = random.choice(words_easy)
-    elif score < 60:
+        base_speed = 0.2
+        spawn_interval = 120
+    elif selected_difficulty == "medium":
         monster_word = random.choice(words_medium)
-    else:
+        base_speed = 0.6
+        spawn_interval = 100
+    else:  # "hard"
         monster_word = random.choice(words_hard)
+        base_speed = 1.0
+        spawn_interval = 80
     
     return {
-        "x":x,
-        "y":y,
-        "img":monster_img,
-        "rect":monster_rect,
-        "word":monster_word,
-        "alive":True,
+        "x": x,
+        "y": y,
+        "img": monster_img,
+        "rect": monster_rect,
+        "word": monster_word,
+        "alive": True,
     }
 
 #---------------------GAME OVER--------------------------------------
@@ -153,7 +176,7 @@ enemy_current_frame = 0
 animation_timer = 0
 enemy_idle_index = 0
 
-show_start_screen()
+show_start_screen_with_difficulty()
 
 #LOOP
 while running:
