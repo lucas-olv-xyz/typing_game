@@ -53,6 +53,23 @@ y_pos = (WINDOW_HEIGHT - height) // 2
 player_rect.center = (x_pos,y_pos)
 side = random.randint(0,3)# 0=esq, 1=dir, 2=top, 3=bottom
 
+enemy_type_1 = [
+    pygame.image.load('e1.png'),
+    pygame.image.load('e2.png'),
+]
+enemy_type_2 = [
+    pygame.image.load('e3.png'),
+    pygame.image.load('e4.png'),
+]
+enemy_type_3 = [
+    pygame.image.load('e5.png'),
+    pygame.image.load('e6.png'),
+]
+enemy_type_4 = [
+    pygame.image.load('e7.png'),
+    pygame.image.load('e8.png'),
+]
+
 #-------------------------ANIMAÇÕES-------------------------------
 player_idle_frames = [pygame.image.load('p1.png'),pygame.image.load('p2.png')]
 enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png')]
@@ -102,8 +119,12 @@ def show_start_screen_with_difficulty():
     return selected_difficulty
 
 selected_difficulty = show_start_screen_with_difficulty()
+
 #-------------------SPAWN DE MONSTROS ALEATORIOS-----------------------------
 def spawn_monster():
+    enemy_types = [enemy_type_1,enemy_type_2,enemy_type_3,enemy_type_4]
+    selected_frames = random.choice(enemy_types)
+    
     monster_img = enemy_idle_frames[0]
     monster_rect = monster_img.get_rect()
     
@@ -145,6 +166,9 @@ def spawn_monster():
         "rect": monster_rect,
         "word": monster_word,
         "alive": True,
+        "frames": selected_frames,
+        "current_frame": 0,
+        "anim_timer": 0,
     }
 
 #---------------------GAME OVER--------------------------------------
@@ -187,105 +211,112 @@ enemy_current_frame = 0
 animation_timer = 0
 enemy_idle_index = 0
 
-show_start_screen_with_difficulty()
+pygame.mixer.music.load(game_music)
+pygame.mixer.music.play(-1)
 
 #LOOP
+# Loop principal do jogo
 while running:
-    pygame.mixer.music.load(game_music)
-    pygame.mixer.music.play(-1)
     clock.tick(60)
-    speed = 0.2
+    
+    # Configura os valores base de velocidade e spawn conforme a dificuldade escolhida
+    if selected_difficulty == "easy":
+        base_speed = 0.2
+        spawn_interval = 120
+    elif selected_difficulty == "medium":
+        base_speed = 0.6
+        spawn_interval = 100
+    else:  # hard
+        base_speed = 1.0
+        spawn_interval = 80
+
+    # Você pode ajustar a velocidade com base na pontuação, se desejar:
+    speed = base_speed + (score * 0.01)
+    
     # 1) Limpa a tela
     tela.fill(GREEN)
-
-    # 2) Desenha o player
+    
+    # 2) Desenha o jogador usando o retângulo já configurado (garanta que a imagem e o retângulo estejam alinhados)
     player_img = player_idle_frames[player_current_frame]
-    tela.blit(player_img, (x_pos,y_pos))
+    tela.blit(player_img, player_rect.topleft)
     animation_counter += 1
-
-    # 8) Desenha o texto digitado
-    texto_digitado = font.render(user_input, True, (BLACK))
-    score_text = font.render(f"Score: {score}", True, (BLACK))
-    vidas_texto = font.render(f'vidas: {vidas}', True, (BLACK))
-    tela.blit(texto_digitado, (x_pos, y_pos - 30))
-    tela.blit(score_text, (10,10))
-    tela.blit(vidas_texto, (10,40))
-    
-    spawn_timer += 1
-    spawn_interval = 120
-    
     if animation_counter > animation_speed:
         animation_counter = 0
-        player_current_frame += 1
-        if player_current_frame >= len(player_idle_frames):
-            player_current_frame = 0
+        player_current_frame = (player_current_frame + 1) % len(player_idle_frames)
     
-    if score >= 30:
-        spawn_interval = 90
-        speed = 0.4
-    if score >= 50:
-        spawn_interval = 60
-        speed = 1.5
+    # 3) Desenha os textos de interface
+    texto_digitado = font.render(user_input, True, BLACK)
+    score_text = font.render(f"Score: {score}", True, BLACK)
+    vidas_texto = font.render(f"Vidas: {vidas}", True, BLACK)
+    tela.blit(texto_digitado, (x_pos, y_pos - 30))
+    tela.blit(score_text, (10, 10))
+    tela.blit(vidas_texto, (10, 40))
     
+    # 4) Atualiza o temporizador de spawn e cria novos inimigos se necessário
+    spawn_timer += 1
     if spawn_timer > spawn_interval:
         monsters.append(spawn_monster())
         spawn_timer = 0
-        
+    
+    # 5) Processa eventos (incluindo digitação)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
-                for monstro in monsters:
-                    if monstro['alive'] and user_input.lower() == monstro['word'].lower():
-                        monstro['alive'] = False
-                        score += 1 
-                        
-                user_input = ""
-            elif event.key == pygame.K_BACKSPACE:
+            if event.key == pygame.K_BACKSPACE:
                 user_input = user_input[:-1]
             else:
                 user_input += event.unicode
-                
-    animation_timer +=1 
-    #COMPORTAMENTO DOS MONSTROS
+                # Verifica imediatamente se o texto digitado bate com a palavra de algum inimigo
+                for monstro in monsters:
+                    if monstro['alive'] and user_input.lower() == monstro['word'].lower():
+                        monstro['alive'] = False
+                        score += 1
+                        user_input = ""  # reseta a digitação
+                        break  # elimina apenas um inimigo por vez
+    
+    # 6) Atualiza o comportamento de cada inimigo
     for monstro in monsters:
         if monstro["alive"]:
-            dx = x_pos - monstro["x"]
-            dy = y_pos - monstro["y"]
+            # Cálculo do vetor de movimento em direção ao centro do jogador
+            dx = player_rect.centerx - monstro["x"]
+            dy = player_rect.centery - monstro["y"]
             dist = (dx**2 + dy**2) ** 0.5
-
             if dist != 0:
                 dx_norm = dx / dist
                 dy_norm = dy / dist
-
                 monstro["x"] += dx_norm * speed
                 monstro["y"] += dy_norm * speed
 
-            if monstro['alive'] and player_rect.colliderect(monstro['rect']):
-                vidas -= 1
-                monstro['alive'] = False
-            if vidas <= 0:
-                Gamer_over_screen(score)
-                running = False
-
-            # Atualizar rect
+            # Atualiza a posição do retângulo para a colisão
             monstro["rect"].x = monstro["x"]
             monstro["rect"].y = monstro["y"]
             
+            # Verifica colisão com o jogador
+            if player_rect.colliderect(monstro["rect"]) and vidas > 0:
+                vidas -= 1
+                monstro["alive"] = False
             
+            if vidas <= 0:
+                vidas = 0
+                pygame.mixer.music.stop()
+                Gamer_over_screen(score)
+                running = False
             
-            if animation_timer > 10:  # a cada 10 frames
-                enemy_idle_index = (enemy_idle_index + 1) % len(enemy_idle_frames)
-                animation_timer = 0  
-                    
-         
+            # Atualiza a animação individual do inimigo
+            monstro["anim_timer"] += 1
+            if monstro["anim_timer"] > 10:  # troca de frame a cada 10 frames
+                monstro["current_frame"] = (monstro["current_frame"] + 1) % len(monstro["frames"])
+                monstro["anim_timer"] = 0
             
-            tela.blit(enemy_idle_frames[enemy_idle_index], (monstro['x'],monstro['y']))
+            # Desenha o inimigo com o frame atual do seu conjunto de sprites
+            tela.blit(monstro["frames"][monstro["current_frame"]], (monstro["x"], monstro["y"]))
             
-            texto_monstro = font.render(monstro['word'], True, (BLACK))
-            tela.blit(texto_monstro, (monstro['x'],monstro['y'] - 20))
+            # Desenha a palavra do inimigo acima dele
+            texto_monstro = font.render(monstro["word"], True, BLACK)
+            tela.blit(texto_monstro, (monstro["x"], monstro["y"] - 20))
 
+        
     pygame.display.flip()
 
 pygame.quit()
