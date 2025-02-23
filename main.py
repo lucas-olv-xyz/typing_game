@@ -53,6 +53,7 @@ y_pos = (WINDOW_HEIGHT - height) // 2
 player_rect.center = (x_pos,y_pos)
 side = random.randint(0,3)# 0=esq, 1=dir, 2=top, 3=bottom
 
+#-------------------------ANIMAÇÕES-------------------------------
 enemy_type_1 = [
     pygame.image.load('e1.png'),
     pygame.image.load('e2.png'),
@@ -69,10 +70,7 @@ enemy_type_4 = [
     pygame.image.load('e7.png'),
     pygame.image.load('e8.png'),
 ]
-
-#-------------------------ANIMAÇÕES-------------------------------
 player_idle_frames = [pygame.image.load('p1.png'),pygame.image.load('p2.png')]
-enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png')]
 
 #-------------------TELA INICIAL------------------------------------
 def show_start_screen_with_difficulty():
@@ -117,8 +115,8 @@ def show_start_screen_with_difficulty():
     pygame.mixer.music.stop()
 
     return selected_difficulty
-
 selected_difficulty = show_start_screen_with_difficulty()
+#--------------------------------------------------------------------
 
 #-------------------SPAWN DE MONSTROS ALEATORIOS-----------------------------
 def spawn_monster():
@@ -170,6 +168,7 @@ def spawn_monster():
         "current_frame": 0,
         "anim_timer": 0,
     }
+#--------------------------------------------------------------------
 
 #---------------------GAME OVER--------------------------------------
 def Gamer_over_screen(score):
@@ -197,7 +196,7 @@ def Gamer_over_screen(score):
                 sys.exit()
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 sys.exit()
-
+#--------------------------------------------------------------------
 
 monsters = []
 score = 0
@@ -214,8 +213,6 @@ enemy_idle_index = 0
 pygame.mixer.music.load(game_music)
 pygame.mixer.music.play(-1)
 
-#LOOP
-# Loop principal do jogo
 while running:
     clock.tick(60)
     
