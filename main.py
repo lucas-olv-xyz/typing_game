@@ -19,6 +19,10 @@ user_input = ""
 monster_alive = True
 vidas = 3
 
+menu_music = "sounds/telainicial.mp3"
+game_music = "sounds/somgame.mp3"
+over_music = "sounds/gameover.mp3"
+
 words_easy = ["A", "B", "C", "D", "E", "F", 
     "G", "H", "I", "J", "K", "L", 
     "M", "N", "O", "P", "Q", "R", 
@@ -51,12 +55,14 @@ side = random.randint(0,3)# 0=esq, 1=dir, 2=top, 3=bottom
 
 #-------------------------ANIMAÇÕES-------------------------------
 player_idle_frames = [pygame.image.load('p1.png'),pygame.image.load('p2.png')]
-enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png'),pygame.image.load('e3.png')]
+enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png')]
 
 #-------------------TELA INICIAL------------------------------------
 def show_start_screen_with_difficulty():
     start_running = True
     selected_difficulty = None
+    pygame.mixer.music.load(menu_music)
+    pygame.mixer.music.play(-1)
     
     while start_running:
         tela.fill(GREEN)
@@ -90,6 +96,8 @@ def show_start_screen_with_difficulty():
                 elif event.key == pygame.K_3:
                     selected_difficulty = "hard"
                     start_running = False
+
+    pygame.mixer.music.stop()
 
     return selected_difficulty
 
@@ -142,6 +150,9 @@ def spawn_monster():
 #---------------------GAME OVER--------------------------------------
 def Gamer_over_screen(score):
     over_running = True
+    pygame.mixer.music.load(over_music)
+    pygame.mixer.music.play(1)
+    
     while over_running:
         tela.fill((GREEN))
         
@@ -180,6 +191,8 @@ show_start_screen_with_difficulty()
 
 #LOOP
 while running:
+    pygame.mixer.music.load(game_music)
+    pygame.mixer.music.play(-1)
     clock.tick(60)
     speed = 0.2
     # 1) Limpa a tela
