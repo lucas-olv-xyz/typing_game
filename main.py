@@ -8,7 +8,7 @@ pygame.init()
 #tela
 WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 600
-GREEN = (172,212,115)
+GREEN = (224,248,207)
 BLACK = (55,54,53)
 font = pygame.font.SysFont(None, 36)
 clock = pygame.time.Clock()
@@ -39,7 +39,7 @@ words_hard = [ "ARQUIPELAGO", "BIBLIOTECA", "CATASTROFICO", "DESENVOLVIMENTO",
     "UNIVERSALIDADE", "VEROSSIMILHANCA", "WESTERNIANO", "XILOFONISTA", 
     "YOUTUBERS", "ZUMBIFICADO"]
 #------------------PERSONAGEM---------------------------------
-player_img = pygame.image.load('h1.png')
+player_img = pygame.image.load('p1.png')
 width, height = player_img.get_size()
 player_rect = player_img.get_rect()
 #posição na tela
@@ -50,7 +50,7 @@ player_rect.center = (x_pos,y_pos)
 side = random.randint(0,3)# 0=esq, 1=dir, 2=top, 3=bottom
 
 #-------------------------ANIMAÇÕES-------------------------------
-player_idle_frames = [pygame.image.load('h1.png'),pygame.image.load('h2.png'),pygame.image.load('h3.png')]
+player_idle_frames = [pygame.image.load('p1.png'),pygame.image.load('p2.png')]
 enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png'),pygame.image.load('e3.png')]
 
 #-------------------TELA INICIAL------------------------------------
