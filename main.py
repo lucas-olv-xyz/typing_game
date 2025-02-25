@@ -206,8 +206,6 @@ def reset_game_state():
     monsters = []
     spawn_timer = 0
 
-
-
 monsters = []
 score = 0
 spawn_timer = 0
@@ -335,7 +333,6 @@ while running:
             texto_monstro = font.render(monstro["word"], True, BLACK)
             tela.blit(texto_monstro, (monstro["x"], monstro["y"] - 20))
 
-        
     pygame.display.flip()
 
 pygame.quit()
