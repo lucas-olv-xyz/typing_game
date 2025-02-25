@@ -14,7 +14,7 @@ font = pygame.font.SysFont(None, 36)
 clock = pygame.time.Clock()
 running = True
 tela = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
-pygame.display.set_caption('Type Magus')
+pygame.display.set_caption('Type')
 user_input = ""
 monster_alive = True
 vidas = 3
@@ -104,17 +104,20 @@ def show_start_screen_with_difficulty():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
                     selected_difficulty = "easy"
-                    start_running = False
+                    start_running = False                   
                 elif event.key == pygame.K_2:
                     selected_difficulty = "medium"
-                    start_running = False
+                    start_running = False                    
                 elif event.key == pygame.K_3:
                     selected_difficulty = "hard"
                     start_running = False
 
+                    
+
     pygame.mixer.music.stop()
 
     return selected_difficulty
+                    
 selected_difficulty = show_start_screen_with_difficulty()
 #--------------------------------------------------------------------
 
@@ -195,6 +198,15 @@ def Gamer_over_screen(score,wpm):
                 elif event.key == pygame.K_q:
                     return 'quit'
 #--------------------------------------------------------------------
+def reset_game_state():
+    global vidas,score,user_input,monsters,spawn_timer
+    vidas = 3
+    score = 0
+    user_input= ""
+    monsters = []
+    spawn_timer = 0
+
+
 
 monsters = []
 score = 0
@@ -205,7 +217,7 @@ player_current_frame = 0
 enemy_current_frame = 0
 animation_timer = 0
 enemy_idle_index = 0
-start_time = 0
+start_time = pygame.time.get_ticks()
 pygame.mixer.music.load(game_music)
 pygame.mixer.music.play(-1)
 
@@ -259,6 +271,10 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_BACKSPACE:
                 user_input = user_input[:-1]
+            elif event.key == pygame.K_ESCAPE:
+                user_input = ""
+            elif event.key == pygame.K_RETURN:
+                user_input = ""
             else:
                 user_input += event.unicode
                 # Verifica imediatamente se o texto digitado bate com a palavra de algum inimigo
@@ -298,10 +314,13 @@ while running:
                 result = Gamer_over_screen(score, wpm)
                 if result == "restart":
                     # Reinicia o jogo, por exemplo, chamando a tela inicial e depois o game_loop
+                    reset_game_state()
                     selected_difficulty = show_start_screen_with_difficulty()
-                    running = True
+                    pygame.mixer.music.load(game_music)
+                    pygame.mixer.music.play(-1)
                 else:
-                    running = False
+                    pygame.quit()
+                    sys.exit()
             
             # Atualiza a animação individual do inimigo
             monstro["anim_timer"] += 1
