@@ -71,6 +71,7 @@ enemy_type_4 = [
     pygame.image.load('e8.png'),
 ]
 player_idle_frames = [pygame.image.load('p1.png'),pygame.image.load('p2.png')]
+enemy_idle_frames = [pygame.image.load('e1.png'),pygame.image.load('e2.png')]
 
 #-------------------TELA INICIAL------------------------------------
 def show_start_screen_with_difficulty():
@@ -146,16 +147,10 @@ def spawn_monster():
     # Dependendo da dificuldade selecionada, sorteie do array correspondente
     if selected_difficulty == "easy":
         monster_word = random.choice(words_easy)
-        base_speed = 0.2
-        spawn_interval = 120
     elif selected_difficulty == "medium":
         monster_word = random.choice(words_medium)
-        base_speed = 0.6
-        spawn_interval = 100
     else:  # "hard"
         monster_word = random.choice(words_hard)
-        base_speed = 1.0
-        spawn_interval = 80
     
     return {
         "x": x,
@@ -216,16 +211,15 @@ pygame.mixer.music.play(-1)
 while running:
     clock.tick(60)
     
-    # Configura os valores base de velocidade e spawn conforme a dificuldade escolhida
     if selected_difficulty == "easy":
         base_speed = 0.2
         spawn_interval = 120
     elif selected_difficulty == "medium":
-        base_speed = 0.6
-        spawn_interval = 100
+        base_speed = 0.3
+        spawn_interval = 110
     else:  # hard
-        base_speed = 1.0
-        spawn_interval = 80
+        base_speed = 0.4
+        spawn_interval = 100
 
     # Você pode ajustar a velocidade com base na pontuação, se desejar:
     speed = base_speed + (score * 0.01)
@@ -237,6 +231,7 @@ while running:
     player_img = player_idle_frames[player_current_frame]
     tela.blit(player_img, player_rect.topleft)
     animation_counter += 1
+    
     if animation_counter > animation_speed:
         animation_counter = 0
         player_current_frame = (player_current_frame + 1) % len(player_idle_frames)
