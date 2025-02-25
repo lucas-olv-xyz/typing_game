@@ -46,7 +46,6 @@ words_hard = [ "ARQUIPELAGO", "BIBLIOTECA", "CATASTROFICO", "DESENVOLVIMENTO",
 player_img = pygame.image.load('p1.png')
 width, height = player_img.get_size()
 player_rect = player_img.get_rect()
-#posição na tela
 #PEGAMOS A LARGURA E A ALTURA TOTAL DA TELA E DIVIDIMOS POR 2, ESSE E O CENTRO DA TELA
 x_pos = (WINDOW_WIDTH - width) // 2
 y_pos = (WINDOW_HEIGHT - height) // 2
@@ -166,7 +165,7 @@ def spawn_monster():
 #--------------------------------------------------------------------
 
 #---------------------GAME OVER--------------------------------------
-def Gamer_over_screen(score):
+def Gamer_over_screen(score,wpm):
     over_running = True
     pygame.mixer.music.load(over_music)
     pygame.mixer.music.play(1)
@@ -174,14 +173,15 @@ def Gamer_over_screen(score):
     while over_running:
         tela.fill((GREEN))
         
-        game_over_text = font.render("GAME OVER", True ,
-                                     (BLACK))
-        score_final_text = font.render(f"Score Final: {score}", True, (BLACK))
-        continuer_text = font.render('Pressione ENTER para sair', True, (BLACK))
+        game_over_text = font.render("GAME OVER", True, BLACK)
+        score_text = font.render(f"Score Final: {score}", True, BLACK)
+        wpm_text = font.render(f"Cadência: {wpm} WPM", True, BLACK)
+        instruction_text = font.render("Pressione R para reiniciar ou Q para sair", True, BLACK)
         
-        tela.blit(game_over_text, (WINDOW_WIDTH//2-80, WINDOW_HEIGHT//2-50))
-        tela.blit(score_final_text, (WINDOW_WIDTH//2-80, WINDOW_HEIGHT//2))
-        tela.blit(continuer_text, (WINDOW_WIDTH//2-120, WINDOW_HEIGHT//2+50))
+        tela.blit(game_over_text, (WINDOW_WIDTH//2 - 80, WINDOW_HEIGHT//2 - 100))
+        tela.blit(score_text, (WINDOW_WIDTH//2 - 80, WINDOW_HEIGHT//2 - 50))
+        tela.blit(wpm_text, (WINDOW_WIDTH//2 - 80, WINDOW_HEIGHT//2))
+        tela.blit(instruction_text, (WINDOW_WIDTH//2 - 200, WINDOW_HEIGHT//2 + 50))
         
         pygame.display.flip()
         
@@ -189,14 +189,15 @@ def Gamer_over_screen(score):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    return 'restart'
+                elif event.key == pygame.K_q:
+                    return 'quit'
 #--------------------------------------------------------------------
 
 monsters = []
 score = 0
-# for _ in range(5):
-#     monsters.append(spawn_monster())
 spawn_timer = 0
 animation_counter = 0
 animation_speed = 10
@@ -204,7 +205,7 @@ player_current_frame = 0
 enemy_current_frame = 0
 animation_timer = 0
 enemy_idle_index = 0
-
+start_time = 0
 pygame.mixer.music.load(game_music)
 pygame.mixer.music.play(-1)
 
@@ -253,7 +254,8 @@ while running:
     # 5) Processa eventos (incluindo digitação)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
+            sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_BACKSPACE:
                 user_input = user_input[:-1]
@@ -290,10 +292,16 @@ while running:
                 monstro["alive"] = False
             
             if vidas <= 0:
-                vidas = 0
                 pygame.mixer.music.stop()
-                Gamer_over_screen(score)
-                running = False
+                total_time = (pygame.time.get_ticks() - start_time) / 60000  # tempo em minutos
+                wpm = int(score / total_time) if total_time > 0 else 0
+                result = Gamer_over_screen(score, wpm)
+                if result == "restart":
+                    # Reinicia o jogo, por exemplo, chamando a tela inicial e depois o game_loop
+                    selected_difficulty = show_start_screen_with_difficulty()
+                    running = True
+                else:
+                    running = False
             
             # Atualiza a animação individual do inimigo
             monstro["anim_timer"] += 1
