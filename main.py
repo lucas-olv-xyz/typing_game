@@ -14,6 +14,8 @@ font = pygame.font.SysFont(None, 36)
 clock = pygame.time.Clock()
 running = True
 tela = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
+background = pygame.image.load('bg.png')
+background = pygame.transform.scale(background,(WINDOW_WIDTH,WINDOW_HEIGHT))
 pygame.display.set_caption('Type')
 user_input = ""
 monster_alive = True
@@ -236,7 +238,8 @@ while running:
     speed = base_speed + (score * 0.01)
     
     # 1) Limpa a tela
-    tela.fill(GREEN)
+    # tela.fill(GREEN)
+    tela.blit(background,(0,0))
     
     # 2) Desenha o jogador usando o retângulo já configurado (garanta que a imagem e o retângulo estejam alinhados)
     player_img = player_idle_frames[player_current_frame]
